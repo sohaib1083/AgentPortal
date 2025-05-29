@@ -1,10 +1,13 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import dbConnect from '@/lib/mongodb'
 import Agent from '@/models/Agent'
 
-export async function DELETE(_: Request, context: { params: { id: string } }) {
-  const { id } = context.params
+export async function DELETE(
+  req: NextRequest,
+  context: { params: { id: string } }
+) {
   await dbConnect()
+  const { id } = context.params
 
   try {
     await Agent.findByIdAndDelete(id)
