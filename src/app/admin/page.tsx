@@ -4,8 +4,11 @@ import Modal from './components/Modal'
 
 import { useEffect, useState } from 'react'
 
+import { AgentType } from '../../types/Agent'
+
+
 export default function AdminDashboard() {
-  const [agents, setAgents] = useState([])
+  const [agents, setAgents] = useState<AgentType[]>([])
   const [isModalOpen, setModalOpen] = useState(false)
   const [modalMessage, setModalMessage] = useState('')
   const [modalType, setModalType] = useState<'success' | 'error'>('error')
