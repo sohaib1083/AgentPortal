@@ -2,12 +2,13 @@ import { NextRequest, NextResponse } from 'next/server'
 import dbConnect from '@/lib/mongodb'
 import Agent from '@/models/Agent'
 
+// Properly typed context using Next.js App Router's RouteParams
 export async function DELETE(
   req: NextRequest,
-  context: { params: { id: string } }
+  { params }: { params: { id: string } }
 ) {
   await dbConnect()
-  const { id } = context.params
+  const { id } = params
 
   try {
     await Agent.findByIdAndDelete(id)
