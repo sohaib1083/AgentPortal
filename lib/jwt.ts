@@ -1,42 +1,26 @@
-import { SignJWT, jwtVerify, type JWTPayload } from 'jose';
+import jwt from 'jsonwebtoken';
 
-
-const secret = new TextEncoder().encode(process.env.JWT_SECRET || 'dev_secret');
-
-export async function signJwt(payload: JWTPayload) {
-  return await new SignJWT(payload)
-    .setProtectedHeader({ alg: 'HS256' })
-    .setIssuedAt()
-    .setExpirationTime('7d')
-    .sign(secret);
+// Ensure your signJwt function properly serializes ObjectIds to strings
+export async function signJwt(payload: any) {
+  // Make sure ObjectId is properly serialized to string
+  const processedPayload = {
+    ...payload,
+    // If id is an ObjectId, convert to string
+    id: payload.id && typeof payload.id.toString === 'function' 
+      ? payload.id.toString() 
+      : payload.id
+  };
+  
+  return jwt.sign(
+    processedPayload, 
+    process.env.JWT_SECRET || 'fallback-secret',
+    { expiresIn: '7d' }
+  );
 }
 
 export async function verifyJwt(token: string) {
   try {
-    const { payload } = await jwtVerify(token, secret);
-    return payload;
-  } catch (e) {
-    return null;
-  }
-}
-
-export function verifyJwtSync(token: string) {
-  try {
-    const [header, payload, signature] = token.split('.');
-    if (!header || !payload || !signature) return null;
-    
-    // Decode payload
-    const decodedPayload = JSON.parse(
-      Buffer.from(payload, 'base64').toString()
-    );
-    
-    // Check expiration
-    const now = Math.floor(Date.now() / 1000);
-    if (decodedPayload.exp && decodedPayload.exp < now) {
-      return null;
-    }
-    
-    return decodedPayload;
+    return jwt.verify(token, process.env.JWT_SECRET || 'fallback-secret') as any;
   } catch (error) {
     console.error('JWT verification error:', error);
     return null;

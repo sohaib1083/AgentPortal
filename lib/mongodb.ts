@@ -33,3 +33,40 @@ async function dbConnect(): Promise<mongoose.Connection> {
 }
 
 export default dbConnect;
+
+import Agent from '../models/Agent';
+
+async function checkSchema() {
+  await dbConnect();
+  
+  // Create a test agent with commission fields
+  const testAgent = new Agent({
+    name: 'Test Agent Schema',
+    email: 'schema-test@example.com',
+    password: 'password123',
+    level: 'L1',
+    totalSales: 100,
+    agentCommissionPercentage: 70,
+    organizationCommissionPercentage: 30
+  });
+  
+  // Validate the agent
+  try {
+    await testAgent.validate();
+    console.log('Schema validation passed!');
+    console.log('Agent fields:', Object.keys(testAgent._doc).filter(k => !k.startsWith('_')));
+    
+    // Don't save, just check if the fields exist in the document
+    if ('agentCommissionPercentage' in testAgent._doc && 'organizationCommissionPercentage' in testAgent._doc) {
+      console.log('Commission fields exist in the document!');
+      console.log('Agent commission:', testAgent.agentCommissionPercentage);
+      console.log('Org commission:', testAgent.organizationCommissionPercentage);
+    } else {
+      console.error('Commission fields are missing from the document!');
+    }
+  } catch (error) {
+    console.error('Schema validation failed:', error);
+  }
+}
+
+checkSchema();
