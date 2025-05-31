@@ -6,13 +6,17 @@ export default function AgentPortal() {
   const [agent, setAgent] = useState<any>(null)
   const [amount, setAmount] = useState('')
 
-  const agentId = '68398d396a96165329bb33e2'
+  // const agentId = '68398d396a96165329bb33e2'
 
   const fetchAgent = async () => {
-    const res = await fetch('/api/agents')
+    const res = await fetch('/api/agents/me', {
+      credentials: 'include',
+    })
+
     const data = await res.json()
-    const match = data.find((a: any) => a._id === agentId)
-    setAgent(match)
+    // const match = data.find((a: any) => a._id === agentId)
+    setAgent(data)
+    // setAgent(match)
   }
 
   const submitSale = async () => {
@@ -20,7 +24,7 @@ export default function AgentPortal() {
     await fetch('/api/sales', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ agentId, amount: parseInt(amount) }),
+      body: JSON.stringify({ amount: parseInt(amount) }),
     })
     setAmount('')
     fetchAgent()

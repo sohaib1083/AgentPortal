@@ -22,14 +22,16 @@ export async function POST(req: Request) {
   const token = await signJwt({ id: agent._id.toString(), role: 'agent' });
 
 
-  // Set cookie
-  (await cookies()).set('token', token, {
-  httpOnly: true,
-  secure: process.env.NODE_ENV === 'production',
-  maxAge: 60 * 60 * 24 * 7,
-  path: '/',
-  });
+ // ✅ Set cookie properly
+  const res = NextResponse.json({ message: 'Login successful' })
+  res.cookies.set('token', token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    path: '/',
+    maxAge: 60 * 60 * 24 * 7,
+  })
 
+  console.log('Login successful for agent:', agent._id.toString());
+  return res;
 
-  return NextResponse.json({ message: 'Login successful', agent });
 }
