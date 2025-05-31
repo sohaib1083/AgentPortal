@@ -19,3 +19,26 @@ export async function verifyJwt(token: string) {
     return null;
   }
 }
+
+export function verifyJwtSync(token: string) {
+  try {
+    const [header, payload, signature] = token.split('.');
+    if (!header || !payload || !signature) return null;
+    
+    // Decode payload
+    const decodedPayload = JSON.parse(
+      Buffer.from(payload, 'base64').toString()
+    );
+    
+    // Check expiration
+    const now = Math.floor(Date.now() / 1000);
+    if (decodedPayload.exp && decodedPayload.exp < now) {
+      return null;
+    }
+    
+    return decodedPayload;
+  } catch (error) {
+    console.error('JWT verification error:', error);
+    return null;
+  }
+}
