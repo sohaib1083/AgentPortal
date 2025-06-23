@@ -12,8 +12,8 @@ export default function LandingPage() {
       <header className="flex justify-between items-center px-8 py-6 bg-[#ffe7b2] border-b-4 border-[#c46b00] shadow-md">
         <h1 className="text-3xl font-extrabold text-[#b9314f] tracking-widest">Global</h1>
         <nav className="space-x-6 text-sm font-medium">
-          <a href="#" className="hover:text-[#b9314f] transition">Home</a>
-          <a href="#" className="hover:text-[#b9314f] transition">About</a>
+          <a href="/" className="hover:text-[#b9314f] transition">Home</a>
+          <a href="/about" className="hover:text-[#b9314f] transition">About</a>
           <a href="#" className="hover:text-[#b9314f] transition">Contact</a>
           <button
             onClick={() => router.push('/login')}
