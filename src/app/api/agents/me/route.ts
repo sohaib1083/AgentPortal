@@ -49,3 +49,47 @@ export async function GET() {
     );
   }
 }
+
+export async function PUT(req: Request) {
+  await dbConnect();
+
+  const cookieStore = await cookies();
+  const token = cookieStore.get('token')?.value;
+
+  if (!token) {
+    return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+  }
+
+  try {
+    const decoded = await verifyJwt(token);
+
+    if (!decoded || !decoded.id) {
+      return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+    }
+
+    const id = decoded.id;
+    const body = await req.json();
+    const agent = await Agent.findById(id);
+
+    if (!agent) {
+      return NextResponse.json({ message: 'Agent not found' }, { status: 404 });
+    }
+
+    if (body.name !== undefined) agent.name = body.name;
+    if (body.email !== undefined) agent.email = body.email;
+    if (body.password !== undefined && body.password.length >= 6) {
+      agent.password = body.password;
+    }
+
+    await agent.save();
+
+    const { password, ...agentData } = agent.toObject();
+    return NextResponse.json(agentData);
+  } catch (error) {
+    console.error('Error updating agent:', error);
+    return NextResponse.json(
+      { message: 'Failed to update agent' },
+      { status: 500 }
+    );
+  }
+}
